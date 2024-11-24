@@ -3,8 +3,8 @@ const itemNodes=Array.from(containerNode.querySelectorAll('.item'));
 const countItems=16;
 const blankNumber=countItems;
 let img = new Image();
- 
-img.src ='D1.png';
+
+    img.src ='d4.png';
 
     let ratio=img.width/img.height;
     const canvas = document.getElementById("canvas");
