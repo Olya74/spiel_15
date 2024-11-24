@@ -3,9 +3,8 @@ const itemNodes=Array.from(containerNode.querySelectorAll('.item'));
 const countItems=16;
 const blankNumber=countItems;
 let img = new Image();
-   //img.src = "src/img/zug.jpg";
-//    img.src = "src/img/20240804_204500.jpg";
-img.src ='src/img/D1.png';
+ 
+img.src ='D1.png';
 
     let ratio=img.width/img.height;
     const canvas = document.getElementById("canvas");
