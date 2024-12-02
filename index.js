@@ -1,41 +1,108 @@
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const btnSelect = document.querySelector(".btnSelect");
+let start=document.getElementById('start');
+const timeEl=document.getElementById('time');
 const containerNode=document.getElementById('fifteen');
+const inpImg=document.getElementById('inpImg');
+const imgSelect=document.getElementById('imgSelect');
+const imgList=document.getElementById('imgList');
+
+let pause=document.getElementById('pause');
+let audio=new Audio();
+let img = new Image();
+img.src ='img/zug.jpg';
+let imgArr=[];
+canvas.width = 400;
+canvas.height = 400;
+let CELL_SIZE = 4;
 const itemNodes=Array.from(containerNode.querySelectorAll('.item'));
 const countItems=16;
-const blankNumber=countItems;
-let img = new Image();
-
-    img.src ='d4.png';
-
-    let ratio=img.width/img.height;
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-    canvas.width = 400;
-    canvas.height = 400;
-    let CELL_SIZE = 4;
-    const puzzleWidth = canvas.width/4;
-    const puzzleHeight = canvas.height/4;
-    const imagePieceWidth = img.width / 4; // Ширина одного сектора изображения
-    const imagePieceHeight = img.height / 4; // Высота одного сектора изображения
-    itemNodes[countItems-1].style.display='none';
-    let matrix=getMatrix(
-    itemNodes.map((item)=>Number(item.dataset.matrixId)));
-    img.onload = () => {
-    //ctx.drawImage(img,400,400/ratio);
-    img.width=400;
-    img.height=400;
-    setPositionItemsWithPicture(matrix,itemNodes);
-    };
-
 if(itemNodes.length!==countItems){
     throw new Error('Invalid number of items');
 }
-//setPositionItems(matrix,itemNodes);
-//setPositionItemsWithPicture(matrix,itemNodes);
+itemNodes[countItems-1].style.display='none';
+let matrix=getMatrix(
+itemNodes.map((item)=>Number(item.dataset.matrixId)));
+const puzzleWidth = canvas.width/CELL_SIZE;
+const puzzleHeight = canvas.height/CELL_SIZE;
+const blankNumber=countItems;
+const imagePieceWidth = img.width / CELL_SIZE; 
+const imagePieceHeight = img.height / CELL_SIZE; 
+
+img.addEventListener('load',()=>{
+    ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    setPositionItemsWithPicture(matrix,itemNodes);
+});
+
+
+let isPaused=false;
+let victory=false;
+let unvictory=false;
+let game=true;
+let startMinutes = 0.25;
+let time=startMinutes*60;
+let idTimer ;
+start.addEventListener('click',()=>{
+  idTimer = setInterval(updateTimer,1000);
+  start.setAttribute('disabled','disabled');
+  start.style.opacity=0.6;
+});
+pause.addEventListener('click',()=>{
+    isPaused=!isPaused;
+    if(isPaused){
+        pause.textContent='continue';
+        pause.style.opacity=0.6;
+    }
+    else{
+        pause.textContent='Pause';
+    }
+});
+
+imgList.addEventListener('click',(e)=>{
+    const imgNode=e.target.closest('img');
+    if(imgNode){
+        img.src = imgNode.src;
+           setPositionItemsWithPicture(matrix,itemNodes);
+           }
+});
+
+imgSelect.addEventListener('click',(e)=>{
+    if(inpImg){inpImg.click();}
+    e.preventDefault();   //prevent navigation to #
+},false);
+
+inpImg.addEventListener('change',(e)=>{
+    const list=document.createElement('ul'); 
+    imgList.appendChild(list);
+    let URL=window.webkitURL || window.URL;
+    let files=e.target.files;
+    for(let i=0;i<files.length;i++){
+        let myImg=new Image();
+       const li=document.createElement('li');
+          list.appendChild(li);
+            myImg.width=100;
+            myImg.height=100;
+            myImg.src=URL.createObjectURL(files[i]);
+            li.appendChild(myImg);
+            imgArr.push(myImg);
+    }
+   
+  if(imgArr.length>0){
+    img.src=imgArr[0].src;
+    img.addEventListener('load',()=>{
+    ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    setPositionItemsWithPicture(matrix,itemNodes);} );
+  }
+    btnSelect.textContent ='Click on the selected image';
+    
+});
 
 document.getElementById('shuffle').addEventListener('click',()=>{
     matrix=getMatrix(shuffleArray(matrix));
     setPositionItems(matrix,itemNodes);
 });
+
 containerNode.addEventListener('click',(e)=>{
     const buttonNode=e.target.closest('button');
     if(!buttonNode){
@@ -49,25 +116,72 @@ containerNode.addEventListener('click',(e)=>{
         swap(blankCoord,buttonCoord,matrix);
         setPositionItems(matrix,itemNodes);
     }
-    
-    
+    if(isVictory(matrix)){
+      victory=true;
+      audio = audioWithPath('img/victory.mp3');
+        createBtnAudio(audio);
+        alert('Victory');
+    }
 });
 
+
 /* helpers */
- function getMatrix(array){
-        const matrix=[];
-        while(array.length){
-            matrix.push(array.splice(0,4));
-        }
-        return matrix;
+
+function setTimerStyle(){
+    timeEl.style.backgroundColor='black';
+    timeEl.style.color='white';
+    timeEl.style.fontSize='2rem';
+    timeEl.style.textAlign='center';
+    timeEl.style.display='inline-block';
+    timeEl.style.padding='0.5rem 3rem';
+    timeEl.style.borderRadius='0.5rem';
+    timeEl.style.boxShadow='0 0 0.8rem  #da1939fa';
+    timeEl.previousSibling.textContent='Time has begun: ';
+}
+
+function updateTimer(){
+   
+    if(!isPaused){
+    let minutes=Math.floor(time/60);
+    let seconds=time%60;
+    seconds=seconds<10?'0'+seconds:seconds;
+    minutes=minutes<10?'0'+minutes:minutes;
+    timeEl.innerHTML=`${minutes}:${seconds}`;
+    setTimerStyle();
+    time--;
     }
+    if(time < 0){
+        unvictory=true;
+        clearInterval(idTimer);
+        audio = audioWithPath('img/ups.mp3');
+        resetTimer();
+    }
+   
+}
+function resetTimer(){
+    time=startMinutes*60;
+    timeEl.innerHTML='';
+    timeEl.previousSibling.textContent='You have 15 minutes';
+    timeEl.style.display='none';
+    start.removeAttribute('disabled');
+    start.style.opacity=1;
+}
+
+
+function getMatrix(array){
+    const matrix=[];
+    while(array.length){
+        matrix.push(array.splice(0,4));
+    }
+    return matrix;
+}
+
+
 function setPositionItems(matrix,arr){
 for(let i=0;i<matrix.length;i++){
     for(let j=0;j<matrix[i].length;j++){
         const itemNode=arr[matrix[i][j]-1];
-        // console.log(
-        //     `i:${i},j:${j},matrix[i][j]: ${matrix[i][j]} ,itemNode:${itemNode}`);
-        
+       
         setNodesStyle(itemNode,j,i);
     }
 }
@@ -80,7 +194,6 @@ function setPositionItemsWithPicture(matrix,arr){
       for(let i=0;i<matrix.length;i++){
         for(let j=0;j<matrix[i].length;j++){
         let itemNodeImg=arr[matrix[i][j]-1];
-         //  console.log(itemNodeImg);
            const sizeMatrixCell=matrix[i].length;
             const itemNode=matrix[i][j];
             const srcCol= (itemNode - 1) % sizeMatrixCell;
@@ -88,8 +201,8 @@ function setPositionItemsWithPicture(matrix,arr){
 
 
             // Координаты на canvas (назначение)
-            const destX = j * puzzleWidth;//x*shiftPs %
-            const destY = i * puzzleHeight;//y*shiftPs %
+            const destX = j * puzzleWidth;
+            const destY = i * puzzleHeight;
             
        if (itemNode !== blankNumber) {
         setNodesStyleWithPicture(srcCol,srcRow,destX,destY,itemNodeImg);
@@ -97,11 +210,8 @@ function setPositionItemsWithPicture(matrix,arr){
        else {
     
         // Для пустого сектора делаем его белым
-
-        ctx.fillStyle = "#ffffff";
-
+        ctx.fillStyle = "white";
         ctx.fillRect(destX, destY, puzzleWidth, puzzleHeight);
-
         itemNodeImg.style.backgroundImage = "none";
 
     }
@@ -112,12 +222,13 @@ function setPositionItemsWithPicture(matrix,arr){
     function setNodesStyleWithPicture(srcCol,srcRow,destX,destY,node){
     node.style.transform=`translate3D(${srcCol*puzzleWidth}%,${srcRow*puzzleHeight}%,0)`;
     ctx.clearRect(0,0,CELL_SIZE,CELL_SIZE);
+    ctx.fillStyle='white';
     ctx.drawImage(
         img,
         srcCol*imagePieceWidth,  srcRow*imagePieceHeight,  
-      imagePieceWidth,imagePieceHeight,                         // Координаты на canvas
+        imagePieceWidth,imagePieceHeight,                         
            destX, destY,   
-           puzzleWidth,puzzleHeight                           // Координаты на canvas       
+           puzzleWidth,puzzleHeight                               
     );
    node.style.backgroundImage=`url(${canvas.toDataURL()})`;
    node.style.backgroundSize = `${canvas.width}px ${canvas.height}px`;
@@ -149,34 +260,40 @@ function shuffleArray(array){
       
     }
 
-    function drawPuzzle(state) {
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
-                const value = state[row][col];
-
-                if (value === 0) {
-                    // Пропускаем пустую часть
-                    ctx.fillStyle = "#000";
-                    ctx.fillRect(col * pieceWidth, row * pieceHeight, pieceWidth, pieceHeight);
-                    continue;
-                }
-
-                // Рассчитываем координаты сектора изображения (источник)
-                const srcCol = (value - 1) % cols;
-                const srcRow = Math.floor((value - 1) / cols);
-
-                // Координаты на canvas (назначение)
-                const destX = col * pieceWidth;
-                const destY = row * pieceHeight;
-
-                // Рисуем часть изображения
-                ctx.drawImage(
-                    img,
-                    srcCol * pieceWidth, srcRow * pieceHeight, // Координаты начала сектора в изображении
-                    pieceWidth, pieceHeight,                   // Размеры сектора в изображении
-                    destX, destY,                              // Координаты на canvas
-                    pieceWidth, pieceHeight                    // Размеры сектора на canvas
-                );
-            }
+function isVictory(matrix){
+    const arr=matrix.flat();
+    for(let i=0;i<arr.length-1;i++){
+        if(arr[i]!==i+1){
+            return false;
         }
     }
+    victory=true;
+    return victory;
+}
+
+function audioWithPath(path){
+    audio.src=path;
+    audio.autoplay=true;
+    return audio;
+}
+
+function createBtnAudio(audio){
+    let btnStopMusik = document.createElement('button');
+    btnStopMusik.setAttribute('id','pause');
+    btnStopMusik.setAttribute('class','button active');
+    btnStopMusik.textContent='Stop music';
+    btnStopMusik.style.position='absolute';
+    btnStopMusik.style.bottom='7rem';
+    btnStopMusik.style.right=0;
+     document.body.appendChild(btnStopMusik);
+      btnStopMusik.addEventListener('click',()=>{
+         btnStopMusik.classList.toggle('active');
+         if(btnStopMusik.classList.contains('active')){
+             audio.play();
+             btnStopMusik.textContent='Stop music';
+         }
+         else {audio.pause();
+             btnStopMusik.textContent='Play music';
+         }
+      });
+}
