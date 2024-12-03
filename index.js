@@ -1,5 +1,43 @@
+let header=document.querySelector('.header');
+let src=window.localStorage.getItem('img');
+let imgArrLocalSrc=[];
+let imgArrSrc=JSON.parse(localStorage.getItem('imgArrLocalSrc'));
+header.style.boxShadow='inset 0 0 0.8rem  #da1939fa';
+const h2=document.createElement('h2');
+h2.style.margin='0.5rem auto';
+h2.textContent='My puzzle';
+header.append(h2);
+header.style.display='flex';
+header.style.alignItems='center';
+header.style.flexDirection='column';
+header.style.position='absolute';
+header.style.top='0';
+header.style.right='0';
+try{
+    if(imgArrSrc){
+        console.log('4',imgArrSrc);
+        
+            imgArrSrc.forEach((src)=>{
+            let imgNode=document.createElement('img');
+            imgNode.width=200;
+            imgNode.height=200;
+            imgNode.setAttribute('alt','my saved image ');
+            imgNode.style.margin='0.5rem';
+                console.log('4',src);
+                imgNode.src=src;
+                header.append(imgNode);   
+        });
+    }
+}
+catch(e){
+    console.log('my',e);
+}
+
+
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+const myCanvas=document.getElementById('myCanvas');
+const myCtx=myCanvas.getContext('2d');
 const btnSelect = document.querySelector(".btnSelect");
 let start=document.getElementById('start');
 const timeEl=document.getElementById('time');
@@ -7,8 +45,29 @@ const containerNode=document.getElementById('fifteen');
 const inpImg=document.getElementById('inpImg');
 const imgSelect=document.getElementById('imgSelect');
 const imgList=document.getElementById('imgList');
-
 let pause=document.getElementById('pause');
+window.localStorage.setItem('data','data');
+let data=window.localStorage.getItem('data');
+console.log(data);
+
+const init = function () {
+    scores = [0, 0];
+    currentScore = 0;
+    activePlayer = 1;
+    isPlaying = true;
+    score1.textContent = 0;
+    score2.textContent = 0;
+    current1.textContent = 0;
+    current2.textContent = 0;
+  
+    diceEl.classList.add("hidden");
+    player1.classList.remove("player--winner");
+    player2.classList.remove("player--winner");
+    player2.classList.remove("player--active");
+    player1.classList.add("player--active");
+  };
+  //init();
+  
 let audio=new Audio();
 let img = new Image();
 img.src ='img/zug.jpg';
@@ -24,6 +83,7 @@ if(itemNodes.length!==countItems){
 itemNodes[countItems-1].style.display='none';
 let matrix=getMatrix(
 itemNodes.map((item)=>Number(item.dataset.matrixId)));
+
 const puzzleWidth = canvas.width/CELL_SIZE;
 const puzzleHeight = canvas.height/CELL_SIZE;
 const blankNumber=countItems;
@@ -58,6 +118,20 @@ pause.addEventListener('click',()=>{
         pause.textContent='Pause';
     }
 });
+let imgALL=document.querySelectorAll('img');
+imgALL.forEach((imgA)=>{
+    imgA.addEventListener('click',(e)=>{
+        imgA.src=e.target.src;
+        if(imgA.src){
+            img.src=imgA.src;
+        console.log('999',img.src);
+    }
+       
+        
+    });
+}
+);
+
 
 imgList.addEventListener('click',(e)=>{
     const imgNode=e.target.closest('img');
@@ -73,10 +147,12 @@ imgSelect.addEventListener('click',(e)=>{
 },false);
 
 inpImg.addEventListener('change',(e)=>{
+    
     const list=document.createElement('ul'); 
     imgList.appendChild(list);
     let URL=window.webkitURL || window.URL;
     let files=e.target.files;
+   
     for(let i=0;i<files.length;i++){
         let myImg=new Image();
        const li=document.createElement('li');
@@ -86,18 +162,42 @@ inpImg.addEventListener('change',(e)=>{
             myImg.src=URL.createObjectURL(files[i]);
             li.appendChild(myImg);
             imgArr.push(myImg);
+            imgArrLocalSrc.push(myImg.src);
+            URL.revokeObjectURL(files[i]);
+    }
+   if(imgArrLocalSrc.length>0){
+    try{
+        window.localStorage.setItem('imgArrLocalSrc',JSON.stringify(imgArrLocalSrc));
+    }catch(e){
+        console.log('my',e);
+        if(e==QUOTA_EXCEEDED_ERR){
+            console.log('Local storage is full');
+        }
     }
    
+   }
   if(imgArr.length>0){
     img.src=imgArr[0].src;
     img.addEventListener('load',()=>{
     ctx.drawImage(img,0,0,canvas.width,canvas.height);
+
+    canvas.toBlob(function(blob){
+
+        let link=document.createElement('a');
+        link.href=URL.createObjectURL(blob);
+        link.download='imgBlob.png';
+        link.click();
+        URL.revokeObjectURL(link.href);}, 'image/png');
+
+
+
+
     setPositionItemsWithPicture(matrix,itemNodes);} );
-  }
+    }
     btnSelect.textContent ='Click on the selected image';
     
 });
-
+// console.log('2',JSON.parse(localStorage.getItem('imgArrLocalSrc')));
 document.getElementById('shuffle').addEventListener('click',()=>{
     matrix=getMatrix(shuffleArray(matrix));
     setPositionItems(matrix,itemNodes);
@@ -181,10 +281,9 @@ function setPositionItems(matrix,arr){
 for(let i=0;i<matrix.length;i++){
     for(let j=0;j<matrix[i].length;j++){
         const itemNode=arr[matrix[i][j]-1];
-       
         setNodesStyle(itemNode,j,i);
     }
-}
+  }
 }
 function setNodesStyle(node,x,y,shiftPs=100){
     node.style.transform=`translate3D(${x*shiftPs}%,${y*shiftPs}%,0)`;
@@ -296,4 +395,32 @@ function createBtnAudio(audio){
              btnStopMusik.textContent='Play music';
          }
       });
+}
+
+let value=1;
+// function draw(){
+//     for(let i=0;i<myCanvas.height;i+=50){
+//         for(let j=0;j< myCanvas.width;j+=50){
+//             myCtx.fillStyle='red';
+//             myCtx.fillRect(i+2,j+2,45,45);
+//             myCtx.fillStyle='black';
+//                     myCtx.font='20px Arial';
+//                     myCtx.fillText(value,i+20,j+30);
+//                     value++;
+//         }
+      
+//     }
+    
+// }
+// draw();
+
+
+
+function shuffleArray(array){
+    let newArr=array.flat();
+    for(let i=newArr.length-1;i>0;i--){
+        let j=Math.floor(Math.random()*(i+1));
+        [newArr[i],newArr[j]]=[newArr[j],newArr[i]];
+    }
+    return newArr;
 }

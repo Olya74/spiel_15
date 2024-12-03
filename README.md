@@ -31,3 +31,9 @@
 ## responsibility
 
 ## audio element 
+
+## 03.12.2024 new branch 
+
+### Arbeit im branch_1
+
+1.header,currentSrcArr, localStorage  -> Ergebnis: img nur bis zum Neustart des Brausers gespeichert 
