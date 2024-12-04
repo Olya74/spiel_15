@@ -1,203 +1,183 @@
-let header=document.querySelector('.header');
-let src=window.localStorage.getItem('img');
+
+const containerNode=document.getElementById('fifteen');
+const itemNodes=Array.from(containerNode.querySelectorAll('.item'));
+const newGame=document.getElementById('newGame');
+const spanName=document.getElementById('spanName');
+const myPuzzle=document.getElementById('myPuzzle');
+let savedImg;
 let imgArrLocalSrc=[];
 let imgArrSrc=JSON.parse(localStorage.getItem('imgArrLocalSrc'));
-header.style.boxShadow='inset 0 0 0.8rem  #da1939fa';
-const h2=document.createElement('h2');
-h2.style.margin='0.5rem auto';
-h2.textContent='My puzzle';
-header.append(h2);
-header.style.display='flex';
-header.style.alignItems='center';
-header.style.flexDirection='column';
-header.style.position='absolute';
-header.style.top='0';
-header.style.right='0';
-try{
-    if(imgArrSrc){
-        console.log('4',imgArrSrc);
-        
-            imgArrSrc.forEach((src)=>{
-            let imgNode=document.createElement('img');
-            imgNode.width=200;
-            imgNode.height=200;
-            imgNode.setAttribute('alt','my saved image ');
-            imgNode.style.margin='0.5rem';
-                console.log('4',src);
-                imgNode.src=src;
-                header.append(imgNode);   
-        });
-    }
-}
-catch(e){
-    console.log('my',e);
-}
 
 
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-const myCanvas=document.getElementById('myCanvas');
-const myCtx=myCanvas.getContext('2d');
-const btnSelect = document.querySelector(".btnSelect");
-let start=document.getElementById('start');
-const timeEl=document.getElementById('time');
-const containerNode=document.getElementById('fifteen');
-const inpImg=document.getElementById('inpImg');
-const imgSelect=document.getElementById('imgSelect');
-const imgList=document.getElementById('imgList');
-let pause=document.getElementById('pause');
-window.localStorage.setItem('data','data');
-let data=window.localStorage.getItem('data');
-console.log(data);
+const inpName=document.getElementById('name');
 
-const init = function () {
-    scores = [0, 0];
-    currentScore = 0;
-    activePlayer = 1;
-    isPlaying = true;
-    score1.textContent = 0;
-    score2.textContent = 0;
-    current1.textContent = 0;
-    current2.textContent = 0;
-  
-    diceEl.classList.add("hidden");
-    player1.classList.remove("player--winner");
-    player2.classList.remove("player--winner");
-    player2.classList.remove("player--active");
-    player1.classList.add("player--active");
-  };
-  //init();
-  
-let audio=new Audio();
+
+inpName.addEventListener('change',(e)=>{
+    spanName.textContent +=e.target.value;
+    spanName.style.fontSize='2rem';
+    spanName.style.textShadow='0 0 0.2rem burlywood';
+    inpName.value='';
+});
+
+
+
+
+let matrix=getMatrix(
+itemNodes.map((item)=>Number(item.dataset.matrixId)));
+
+let audio=null;
 let img = new Image();
-img.src ='img/zug.jpg';
+img.src='asserts/img/4.png';
 let imgArr=[];
-canvas.width = 400;
-canvas.height = 400;
+
+
+
+
 let CELL_SIZE = 4;
-const itemNodes=Array.from(containerNode.querySelectorAll('.item'));
 const countItems=16;
 if(itemNodes.length!==countItems){
     throw new Error('Invalid number of items');
 }
 itemNodes[countItems-1].style.display='none';
-let matrix=getMatrix(
-itemNodes.map((item)=>Number(item.dataset.matrixId)));
+let idTimer ;
+let isPaused;
+let victory;
+let unvictory;
+let game;
 
+let startMinutes = 0.25;
+let time=startMinutes*60;
+
+const btnSelect = document.querySelector(".btnSelect");
+const start=document.getElementById('start');
+const timeEl=document.getElementById('time');
+
+const inpImg=document.getElementById('inpImg');
+const imgSelect=document.getElementById('imgSelect');
+const imgList=document.getElementById('imgList');
+const pause=document.getElementById('pause');
+const opt=document.getElementById('opt');
+
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 const puzzleWidth = canvas.width/CELL_SIZE;
 const puzzleHeight = canvas.height/CELL_SIZE;
 const blankNumber=countItems;
 const imagePieceWidth = img.width / CELL_SIZE; 
 const imagePieceHeight = img.height / CELL_SIZE; 
 
-img.addEventListener('load',()=>{
-    ctx.drawImage(img,0,0,canvas.width,canvas.height);
-    setPositionItemsWithPicture(matrix,itemNodes);
+const init = function () {
+    isPaused=false;
+    victory=false;
+    unvictory=false;
+    game=true;
+    savedImg=false;
+    img.addEventListener('load',()=>{
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        setPositionItemsWithPicture(matrix,itemNodes);
+matrix=getMatrix(shuffleArray(matrix));
+setPositionItems(matrix,itemNodes);
+    });
+   if(savedImg){
+   // localStorage.removeItem('imgArrLocalSrc');
+   imgArrSrc=null;
+   }
+  };
+    init();
+
+//events
+
+
+newGame.addEventListener('click',(e)=>{
+    resetTimer();
+    isPaused=false;
+    victory=false;
+    unvictory=false;
+    game=true;
+     matrix=getMatrix(shuffleArray(matrix));
+    setPositionItems(matrix,itemNodes);
 });
-
-
-let isPaused=false;
-let victory=false;
-let unvictory=false;
-let game=true;
-let startMinutes = 0.25;
-let time=startMinutes*60;
-let idTimer ;
 start.addEventListener('click',()=>{
   idTimer = setInterval(updateTimer,1000);
   start.setAttribute('disabled','disabled');
   start.style.opacity=0.6;
-});
+
 pause.addEventListener('click',()=>{
     isPaused=!isPaused;
     if(isPaused){
         pause.textContent='continue';
-        pause.style.opacity=0.6;
+        pause.style.backgroundColor='rgb(75, 75, 156)';
     }
     else{
         pause.textContent='Pause';
+        pause.style.backgroundColor='black';
     }
 });
-let imgALL=document.querySelectorAll('img');
-imgALL.forEach((imgA)=>{
-    imgA.addEventListener('click',(e)=>{
-        imgA.src=e.target.src;
-        if(imgA.src){
-            img.src=imgA.src;
-        console.log('999',img.src);
-    }
-       
-        
-    });
-}
-);
-
-
-imgList.addEventListener('click',(e)=>{
-    const imgNode=e.target.closest('img');
-    if(imgNode){
-        img.src = imgNode.src;
-           setPositionItemsWithPicture(matrix,itemNodes);
-           }
 });
-
+//Eingabe ausblenden
 imgSelect.addEventListener('click',(e)=>{
     if(inpImg){inpImg.click();}
     e.preventDefault();   //prevent navigation to #
 },false);
 
 inpImg.addEventListener('change',(e)=>{
-    
     const list=document.createElement('ul'); 
     imgList.appendChild(list);
     let URL=window.webkitURL || window.URL;
     let files=e.target.files;
-   
+    if(files.length <=0 ) return;
     for(let i=0;i<files.length;i++){
-        let myImg=new Image();
-       const li=document.createElement('li');
-          list.appendChild(li);
+            let myImg = new Image();
+            const li=document.createElement('li');
+            list.appendChild(li);
             myImg.width=100;
             myImg.height=100;
             myImg.src=URL.createObjectURL(files[i]);
             li.appendChild(myImg);
             imgArr.push(myImg);
-            imgArrLocalSrc.push(myImg.src);
-            URL.revokeObjectURL(files[i]);
+           imgArrLocalSrc.push(myImg.src);
+           URL.revokeObjectURL(files[i]);
     }
-   if(imgArrLocalSrc.length>0){
+    
+    let res =confirm('Do you want to save the image on your computer?');
+           if(res){
+           canvas.toBlob(function(blob){
+               let link=document.createElement('a');
+               link.href=URL.createObjectURL(blob);
+               link.download='imgBlob.png';
+               link.click();
+               URL.revokeObjectURL(link.href);}, 'image/png');
+           }
+
+   if(imgArrLocalSrc.length>0 && !savedImg){
     try{
+       
         window.localStorage.setItem('imgArrLocalSrc',JSON.stringify(imgArrLocalSrc));
+        savedImg=true;
+        
+
     }catch(e){
-        console.log('my',e);
+    
         if(e==QUOTA_EXCEEDED_ERR){
             console.log('Local storage is full');
         }
     }
    
    }
-  if(imgArr.length>0){
-    img.src=imgArr[0].src;
-    img.addEventListener('load',()=>{
-    ctx.drawImage(img,0,0,canvas.width,canvas.height);
-
-    canvas.toBlob(function(blob){
-
-        let link=document.createElement('a');
-        link.href=URL.createObjectURL(blob);
-        link.download='imgBlob.png';
-        link.click();
-        URL.revokeObjectURL(link.href);}, 'image/png');
-
-
-
-
-    setPositionItemsWithPicture(matrix,itemNodes);} );
-    }
+   if(imgArr.length>0){
+                img.src=imgArr[0].src;
+                img.addEventListener('load',()=>{
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        setPositionItemsWithPicture(matrix,itemNodes);  
+   });
     btnSelect.textContent ='Click on the selected image';
+    }
     
 });
-// console.log('2',JSON.parse(localStorage.getItem('imgArrLocalSrc')));
+        
+
 document.getElementById('shuffle').addEventListener('click',()=>{
     matrix=getMatrix(shuffleArray(matrix));
     setPositionItems(matrix,itemNodes);
@@ -218,10 +198,32 @@ containerNode.addEventListener('click',(e)=>{
     }
     if(isVictory(matrix)){
       victory=true;
-      audio = audioWithPath('img/victory.mp3');
+      audio = audioWithPath('asserts/img/victory.mp3');
         createBtnAudio(audio);
         alert('Victory');
     }
+});
+
+
+document.addEventListener('click',(e)=>{
+    if(e.target.closest('img')){
+       img.src=e.target.src;
+       img.addEventListener('load',()=>{
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        setPositionItemsWithPicture(matrix,itemNodes);});
+    }
+}
+);
+imgList.addEventListener('click',(e)=>{
+    let imgNode=e.target.closest('img');
+    if(imgNode){
+        img.src = imgNode.src;
+        img.addEventListener('load',()=>{
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        setPositionItemsWithPicture(matrix,itemNodes);});
+           }
 });
 
 
@@ -252,8 +254,8 @@ function updateTimer(){
     }
     if(time < 0){
         unvictory=true;
-        clearInterval(idTimer);
-        audio = audioWithPath('img/ups.mp3');
+        //clearInterval(idTimer);
+        audio = audioWithPath('asserts/img/ups.mp3');
         resetTimer();
     }
    
@@ -265,6 +267,7 @@ function resetTimer(){
     timeEl.style.display='none';
     start.removeAttribute('disabled');
     start.style.opacity=1;
+    clearInterval(idTimer);
 }
 
 
@@ -371,6 +374,7 @@ function isVictory(matrix){
 }
 
 function audioWithPath(path){
+    audio=new Audio();
     audio.src=path;
     audio.autoplay=true;
     return audio;
@@ -382,8 +386,8 @@ function createBtnAudio(audio){
     btnStopMusik.setAttribute('class','button active');
     btnStopMusik.textContent='Stop music';
     btnStopMusik.style.position='absolute';
-    btnStopMusik.style.bottom='7rem';
-    btnStopMusik.style.right=0;
+    btnStopMusik.style.bottom='2rem';
+    btnStopMusik.style.left='2rem';
      document.body.appendChild(btnStopMusik);
       btnStopMusik.addEventListener('click',()=>{
          btnStopMusik.classList.toggle('active');
@@ -397,30 +401,15 @@ function createBtnAudio(audio){
       });
 }
 
-let value=1;
-// function draw(){
-//     for(let i=0;i<myCanvas.height;i+=50){
-//         for(let j=0;j< myCanvas.width;j+=50){
-//             myCtx.fillStyle='red';
-//             myCtx.fillRect(i+2,j+2,45,45);
-//             myCtx.fillStyle='black';
-//                     myCtx.font='20px Arial';
-//                     myCtx.fillText(value,i+20,j+30);
-//                     value++;
-//         }
-      
-//     }
-    
-// }
-// draw();
-
-
-
-function shuffleArray(array){
-    let newArr=array.flat();
-    for(let i=newArr.length-1;i>0;i--){
-        let j=Math.floor(Math.random()*(i+1));
-        [newArr[i],newArr[j]]=[newArr[j],newArr[i]];
+  
+    if(imgArrSrc){
+            imgArrSrc.forEach((src)=>{
+            let imgNode=document.createElement('img');
+            imgNode.width=200;
+            imgNode.height=200;
+            imgNode.setAttribute('alt','my saved image ');
+            imgNode.style.margin='0.5rem';
+                imgNode.src=src;
+                myPuzzle.append(imgNode);   
+        });
     }
-    return newArr;
-}

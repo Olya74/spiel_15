@@ -9,8 +9,9 @@
   <body>
       <div class="page">
         <h1>Play in 15</h1>
-        <p>Assemble this picture or select some images</p>
-        <p>You have 15 minutes <span id="time"></span></p>
+        <p>Assemble this picture or select some images.</p>
+        <p>Write your name <input type="text" value="" id="name"></p>
+        <p><span id="spanName"></span>  you have 15 minutes <span id="time"></span></p>
         <canvas id="canvas" width="400" height="400"></canvas>
     <div class="fifteen" id="fifteen">
        <button class="item" data-matrix-id="1"><span class="itemVal">1</span></button ><button class='item' data-matrix-id='2'><span class="itemVal">2</span></button
@@ -31,11 +32,16 @@
     <input type="file" accept="image/*" id="inpImg" multiple style="display: none;">
     <div id="imgList"></div> 
       </div>
-      <canvas id="myCanvas" width="200"  height="200"></canvas>
-      <div class="header"  id="myPuzzle" ></div>
+      <div id="myPuzzle">
+        <h2>My puzzle</h2>
+      </div>
     </div>
     </body>
-    <script src="index.js"></script>
+    <script src="./index.js" type="module"></script>
+    <script>
+     
+      
+    </script>
   </body>
 </html>
 

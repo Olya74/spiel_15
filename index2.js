@@ -197,3 +197,21 @@ function shuffleArray(array){
             }
         }
     }
+
+
+//     let value=1;
+// function draw(){
+//     for(let i=0;i<myCanvas.height;i+=50){
+//         for(let j=0;j< myCanvas.width;j+=50){
+//             myCtx.fillStyle='red';
+//             myCtx.fillRect(i+2,j+2,45,45);
+//             myCtx.fillStyle='black';
+//                     myCtx.font='20px Arial';
+//                     myCtx.fillText(value,i+20,j+30);
+//                     value++;
+//         }
+      
+//     }
+    
+// }
+// draw();
