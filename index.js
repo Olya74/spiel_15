@@ -34,7 +34,7 @@ let isStarted;
 let victory;
 let unvictory;
 let audio=null;
-let startMinutes = 0.25;
+let startMinutes =15;
 let time=startMinutes*60;
 let imgArr=[];
 
