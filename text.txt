@@ -1,4 +1,17 @@
+ //module
+ index3.js
+ import {Player} from "./classes/Player.js";
+ index.html
+ <script src="./index3.js" type="module"></script>
 
+
+
+
+
+ start time -> stop
+
+//color picker inputValue
+  <input type="color" id="color" value='#12ffc4'>
 
 
 

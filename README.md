@@ -46,4 +46,6 @@
 
 2.bei speicherung img vom lokal computer muss ich img in blob Daten.Wenn die Seite neu geladen wird ist alles gut.Die Bilder werden angezeigt.Aber nach dem Schließen der Seite ist es unmöglich,sie darzustellen.
 
+## 05.12.2024
 
+1.Fix bag :Beim Vershieben der Sortierung am Anfand des Spiels kommt es zu Duplikaten.Beim Sort überschnitten sich Stile.Dazu war node.style.transform in setNodesStyleWithPicture() :  entfrnt

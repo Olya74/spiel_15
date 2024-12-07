@@ -41,6 +41,9 @@ let imgArr=[];
 players =(JSON.parse(localStorage.getItem('players')) || []).map((obj)=>Player.fromJSON(obj));
 
 
+
+
+
 //current player by name from input
     inpName.addEventListener('change', (e) => {
         const existingPlayer = players.find(
@@ -65,11 +68,11 @@ players =(JSON.parse(localStorage.getItem('players')) || []).map((obj)=>Player.f
         localStorage.setItem('players', JSON.stringify(players));
         spanName.textContent = `Welcome, ${currentPlayer.name}`;
         inpName.value = '';
-        console.log('currentPlayer after login:', currentPlayer);
+        console.log('currentPlayer:', currentPlayer);
+        pName.style.display='none';
     });
 
 let imgSrc=['asserts/img/1.png','asserts/img/2.png','asserts/img/3.png','asserts/img/4.png','asserts/img/D1.png'];
-
 let matrix=getMatrix(
 itemNodes.map((item)=>Number(item.dataset.matrixId)));
 
@@ -90,14 +93,19 @@ const init = function () {
    matrix=getMatrix(shuffleArray(matrix));
    setPositionItems(matrix,itemNodes);
    //setPositionItemsWithPicture(matrix,itemNodes);
-   console.log('isStartedInit:',isStarted);
     });
+
     currentPlayer = players.find((player)=>player.active===true) || new Player('Guest');
-    spanName.textContent = `Welcome, ${currentPlayer.name}`;
+    
+   spanName.textContent = `Welcome, ${currentPlayer.name}`;
   };
     init();
+console.log('currentPlayer:',currentPlayer);
+
 
 //events
+
+
 
 newGame.addEventListener('click',(e)=>{
     resetTimer();
@@ -105,26 +113,14 @@ newGame.addEventListener('click',(e)=>{
     isPaused=false;
     victory=false;
     unvictory=false;
-    start.textContent='Start';
-    start.classList.remove('button_active');
     //game=true;
      matrix=getMatrix(shuffleArray(matrix));
     setPositionItems(matrix,itemNodes);
    // setPositionItemsWithPicture(matrix,itemNodes);
 });
 start.addEventListener('click',()=>{
-    isStarted=!isStarted;
-    if(isStarted){     
   idTimer = setInterval(updateTimer,1000);
-  start.classList.add('button_active');
-  start.textContent='Stop';
-    }
-    else if (!isStarted)
-    {
-start.classList.remove('button_active');
-start.textContent='Start';
-resetTimer();
-    }
+  start.style.opacity=0.6;
 
 pause.addEventListener('click',()=>{
     isPaused=!isPaused;
@@ -137,7 +133,6 @@ pause.addEventListener('click',()=>{
         pause.style.backgroundColor='black';
     }
 });
-
 });
 //Eingabe ausblenden
 imgSelect.addEventListener('click',(e)=>{
@@ -210,7 +205,6 @@ containerNode.addEventListener('click',(e)=>{
       audio = audioWithPath('asserts/img/victory.mp3');
         createBtnAudio(audio);
         alert('Victory');
-        isStarted=false;
     }
 });
 
@@ -273,9 +267,22 @@ imgList.addEventListener('click', (e) => {
 
 /* helpers */
 
+function setTimerStyle(){
+    timeEl.style.backgroundColor='black';
+    timeEl.style.color='white';
+    timeEl.style.fontSize='2rem';
+    timeEl.style.textAlign='center';
+    timeEl.style.display='inline-block';
+    timeEl.style.padding='0.5rem 3rem';
+    timeEl.style.borderRadius='0.5rem';
+    timeEl.style.boxShadow='0 0 0.8rem  #da1939fa';
+    timeEl.previousSibling.textContent='Time has begun: ';
+}
+
 function updateTimer(){
-    isStarted=true;
-    if(isStarted && !isPaused){
+   
+    if(!isPaused){
+        isStarted=true;
     let minutes=Math.floor(time/60);
     let seconds=time%60;
     seconds=seconds<10?'0'+seconds:seconds;
@@ -285,32 +292,22 @@ function updateTimer(){
     time--;
     }
     if(time < 0){
-       isStarted=false;
         unvictory=true;
+        //clearInterval(idTimer);
         audio = audioWithPath('asserts/img/ups.mp3');
         resetTimer();
-        audio=null;
     }
-console.log('isStartedUpdate:',isStarted);
-
-}
-function setTimerStyle(){
-    timeEl.classList.add('time_active');
-    const span=document.createElement('span');
-    span.style.fontSize='1.3rem';
-    span.textContent='Time has begun: ';
-    timeEl.prepend(span); 
-    timeEl.style.display='inline-block'; 
+   
 }
 function resetTimer(){
-    audio=null
+    isStarted=false;
     time=startMinutes*60;
     timeEl.innerHTML='';
-    timeEl.previousSibling.textContent='';
+    timeEl.previousSibling.textContent='You have 15 minutes';
     timeEl.style.display='none';
+    start.removeAttribute('disabled');
     start.style.opacity=1;
     clearInterval(idTimer);
-
 }
 
 

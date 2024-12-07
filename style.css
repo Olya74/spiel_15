@@ -8,15 +8,24 @@ body,
 html{font: 16px/1.4 Georgia,serif;
     height: 100vh;
     background-image: linear-gradient(150deg, #f5f7fa 0%, #c3cfe2 100%);
-}
-body{
     position: relative;
+
 }
+    
+
 p{margin-bottom: 1em;
     font-weight: 600;
     
 }
-
+#spanName{
+    font-weight: 700;
+    font-size: 1.3rem;
+    padding: 0.5rem;
+    margin: 0.5rem;
+    color:rgb(58, 3, 3);
+    box-shadow: 0 0 0.5rem #1b0901;
+    font-family:Georgia, 'Times New Roman', Times, serif
+}
 .page{max-width: 29rem;padding: 2rem;margin: 0 auto;text-align: center;user-select: none;
 }
 #canvas{
@@ -48,14 +57,24 @@ a{color: #e9dbddfa;
     justify-content: center;
     border-radius: 5px;
     position:absolute;
-    top:0;
+    bottom:0;
     right:0;
-    width:15rem;
-    box-shadow:inset 0 0 0.8rem  #da1939fa;
+    width:12rem;
+    box-shadow: 0 0 0.5rem #1b0901;
+        /* box-shadow:inset 0 0 0.8rem  #da1939fa;
+} */
+   
 }
+    
 img{
    object-fit: cover;
    object-position: center;
+   width: 10rem;
+    height: 10rem;
+}
+img:hover{
+    opacity: 0.8;
+    box-shadow: 2px 2px 2px #000;
 }
 h1{font:2rem/1 Georgia,serif;margin-bottom: 1em;
 }
@@ -84,13 +103,14 @@ h1{font:2rem/1 Georgia,serif;margin-bottom: 1em;
         border: 0;
         cursor: pointer;
         box-shadow: inset 1px 1px black;
-        transition: transform 0.4s;
+        transition: transform 1s;
         text-align: center;
         font-weight: 600;
         font-size: 1.6rem;
-        background-color: rgb(52, 196, 196);
+        background-color: #fff;
         &:hover{
-           opacity: 0.6;
+           opacity: 0.8;
+           box-shadow: 0 0 8px #000;
         } 
 
     }
@@ -105,6 +125,7 @@ h1{font:2rem/1 Georgia,serif;margin-bottom: 1em;
     padding: 0.5rem 1.5rem;
     &:hover{
         opacity: 0.7;
+        box-shadow: 2px 2px 2px #000;
     }
 }
 @media (min-width: 1160px){
@@ -136,4 +157,24 @@ h1{font:2rem/1 Georgia,serif;margin-bottom: 1em;
         display: none;
         background-color: rgb(75, 75, 156);
     }
+}
+.hover{
+    opacity: 0.8;
+    box-shadow: 2px 2px 2px #000;
+}
+.button_active{
+    background-color:rgb(224, 26, 26);
+    box-shadow: inset 0 0 0.8rem  #131212fa;
+    font-weight: 700;
+}
+.time_active{
+    background-color:black;
+    /* box-shadow: inset 0 0 2rem  #fff; */
+    box-shadow: inset 0 0 2rem  #e60303;
+    font-weight: 600;
+    color: #fff;
+    display: inline-block;
+    padding:0.5rem 0.8rem;
+    font-size: 2rem;
+    margin: 0 auto 0.6rem;
 }
