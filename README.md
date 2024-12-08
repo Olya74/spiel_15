@@ -49,3 +49,17 @@
 ## 05.12.2024
 
 1.Fix bag :Beim Vershieben der Sortierung am Anfand des Spiels kommt es zu Duplikaten.Beim Sort überschnitten sich Stile.Dazu war node.style.transform in setNodesStyleWithPicture() :  entfrnt
+
+2.funktionen für Stop und Play musik
+
+3.funktionen für timer :stop,start
+
+#### für Anzeige beim Spiel
+
+```createInfo('Guest',0,0);
+ setTimeout(()=>{
+     document.getElementById('info').remove();
+ }
+ ,3000);
+```
+### info block createt

@@ -1,5 +1,8 @@
 import {Player} from "./classes/Player.js";
-
+const mediaQuery650 = window.matchMedia('(max-width: 650px)');
+const mediaQuery897 = window.matchMedia('(max-width: 897px)');
+const mediaQuery1300 = window.matchMedia('(max-width: 1300px)');
+const mediaQuery1550 = window.matchMedia('(max-width: 1550px)');
 let img = new Image();
 img.src='asserts/img/4.png';
 const canvas = document.getElementById("canvas");
@@ -18,6 +21,7 @@ const pName=document.getElementById('pName');
 const inpImg=document.getElementById('inpImg');
 const imgSelect=document.getElementById('imgSelect');
 const imgList=document.getElementById('imgList');
+const shuffle=document.getElementById('shuffle');
 let CELL_SIZE = 4;
 const countItems=16;
 const puzzleWidth = canvas.width/CELL_SIZE;
@@ -26,17 +30,22 @@ const blankNumber=countItems;
 const imagePieceWidth = img.width / CELL_SIZE; 
 const imagePieceHeight = img.height / CELL_SIZE; 
 
+
 let players;   
 let currentPlayer;
 let idTimer ;
 let isPaused;
 let isStarted;
 let victory;
+let score;
 let unvictory;
 let audio=null;
-let startMinutes =15;
+let startMinutes =0.6;
 let time=startMinutes*60;
 let imgArr=[];
+let isAudioPlay=false;
+let timeVictory;
+
 
 players =(JSON.parse(localStorage.getItem('players')) || []).map((obj)=>Player.fromJSON(obj));
 
@@ -65,7 +74,6 @@ players =(JSON.parse(localStorage.getItem('players')) || []).map((obj)=>Player.f
         localStorage.setItem('players', JSON.stringify(players));
         spanName.textContent = `Welcome, ${currentPlayer.name}`;
         inpName.value = '';
-        console.log('currentPlayer after login:', currentPlayer);
     });
 
 let imgSrc=['asserts/img/1.png','asserts/img/2.png','asserts/img/3.png','asserts/img/4.png','asserts/img/D1.png'];
@@ -86,11 +94,14 @@ const init = function () {
     unvictory=false;
     img.addEventListener('load',()=>{
         ctx.drawImage(img,0,0,canvas.width,canvas.height);
-   setPositionItemsWithPicture(matrix,itemNodes);
-   matrix=getMatrix(shuffleArray(matrix));
-   setPositionItems(matrix,itemNodes);
-   //setPositionItemsWithPicture(matrix,itemNodes);
-   console.log('isStartedInit:',isStarted);
+        setPositionItemsWithPicture(matrix,itemNodes);
+        setPositionItems(matrix,itemNodes);
+        //setPositionItemsWithPicture(matrix,itemNodes);
+//     ctx.drawImage(img,0,0,canvas.width,canvas.height);
+//    setPositionItemsWithPicture(matrix,itemNodes);
+//    matrix=getMatrix(shuffleArray(matrix));
+//    setPositionItems(matrix,itemNodes);
+//    //setPositionItemsWithPicture(matrix,itemNodes);
     });
     currentPlayer = players.find((player)=>player.active===true) || new Player('Guest');
     spanName.textContent = `Welcome, ${currentPlayer.name}`;
@@ -100,6 +111,9 @@ const init = function () {
 //events
 
 newGame.addEventListener('click',(e)=>{
+    if(e.target.closest('button').id!=='newGame'){
+        return;
+    }
     resetTimer();
     isStarted=false;
     isPaused=false;
@@ -107,7 +121,6 @@ newGame.addEventListener('click',(e)=>{
     unvictory=false;
     start.textContent='Start';
     start.classList.remove('button_active');
-    //game=true;
      matrix=getMatrix(shuffleArray(matrix));
     setPositionItems(matrix,itemNodes);
    // setPositionItemsWithPicture(matrix,itemNodes);
@@ -137,8 +150,28 @@ pause.addEventListener('click',()=>{
         pause.style.backgroundColor='black';
     }
 });
-
+if(unvictory){
+    victory=false;
+    isAudioPlay=true;
+    isStarted=false;
+    audio = audioWithPath('asserts/img/ups.mp3');
+    createBtnAudio(audio);
+    if(isAudioPlay){
+    }
+    score=-100;
+    currentPlayer.addScore(score);
+    createInfo(currentPlayer.name,score,time,currentPlayer.score);
+    setTimeout(()=>{
+        document.getElementById('info').remove();
+      },30000);
+    localStorage.setItem('players',JSON.stringify(players));
+    unvictory=false;
+    start.classList.remove('button_active');
+    start.textContent='Start';
+    resetTimer();
+}
 });
+
 //Eingabe ausblenden
 imgSelect.addEventListener('click',(e)=>{
     if(inpImg){inpImg.click();}
@@ -185,7 +218,7 @@ inpImg.addEventListener('change',(e)=>{
 });
         
 
-document.getElementById('shuffle').addEventListener('click',()=>{
+shuffle.addEventListener('click',()=>{
     matrix=getMatrix(shuffleArray(matrix));
     setPositionItems(matrix,itemNodes);
     
@@ -207,14 +240,29 @@ containerNode.addEventListener('click',(e)=>{
     }
     if(isVictory(matrix)){
       victory=true;
+      timeVictory=startMinutes*60-time;
+      console.log('timeVictory',timeVictory);
+      score=Math.floor(10000/timeVictory);
+      currentPlayer.addScore(score);
+      isAudioPlay=true;
+      localStorage.setItem('players',JSON.stringify(players));
+      if(isAudioPlay){
       audio = audioWithPath('asserts/img/victory.mp3');
         createBtnAudio(audio);
-        alert('Victory');
         isStarted=false;
     }
+    }
+    if(victory){
+        start.classList.remove('button_active');
+        start.textContent='Start';
+        resetTimer();
+        createInfo(currentPlayer.name,score,timeVictory,currentPlayer.score);
+        victory=false;
+       setTimeout(()=>{
+         document.getElementById('info').remove();
+       },30000);
+    }
 });
-
-
 document.addEventListener('click',(e)=>{
     if(e.target.closest('img')){
        img.src=e.target.src;
@@ -291,8 +339,10 @@ function updateTimer(){
         resetTimer();
         audio=null;
     }
-console.log('isStartedUpdate:',isStarted);
-
+    if(unvictory){
+        alert('Time is over');
+        unvictory=false;
+    }
 }
 function setTimerStyle(){
     timeEl.classList.add('time_active');
@@ -422,24 +472,29 @@ function audioWithPath(path){
     audio.autoplay=true;
     return audio;
 }
-
 function createBtnAudio(audio){
     let btnStopMusik = document.createElement('button');
-    btnStopMusik.setAttribute('id','pause');
-    btnStopMusik.setAttribute('class','button active');
+    btnStopMusik.setAttribute('id','btnPause');
+    btnStopMusik.setAttribute('class','button_active');
     btnStopMusik.textContent='Stop music';
-    btnStopMusik.style.position='absolute';
-    btnStopMusik.style.bottom='2rem';
-    btnStopMusik.style.left='2rem';
-     document.body.appendChild(btnStopMusik);
+    btnStopMusik.style.padding='0.6rem';
+    btnStopMusik.style.marginLeft='1rem';
+    btnStopMusik.style.fontWeight='bold';
+    btnStopMusik.style.color='white';
+    btnStopMusik.style.fontSize='2rem';
+    btnStopMusik.style.borderLeftColor='yellow';
+  
+    newGame.append(btnStopMusik);
       btnStopMusik.addEventListener('click',()=>{
-         btnStopMusik.classList.toggle('active');
-         if(btnStopMusik.classList.contains('active')){
+         btnStopMusik.classList.toggle('button_active');
+         if(btnStopMusik.classList.contains('button_active')){
+            btnStopMusik.classList.remove('button_play_pause');
              audio.play();
-             btnStopMusik.textContent='Stop music';
+             btnStopMusik.textContent='Pause music';
          }
          else {audio.pause();
              btnStopMusik.textContent='Play music';
+           btnStopMusik.classList.add('button_play_pause');
          }
       });
 }
@@ -450,4 +505,97 @@ function createElementImg(src){
     img.width=100;
     img.height=100;
     return img;
+}
+
+function createInfo(name,score,time,totalScore){
+    let info=document.createElement('div');
+    info.setAttribute('id','info');
+    let minutes=Math.floor(time/60);
+    let seconds=time%60;
+    if(victory){
+    info.innerHTML=`
+    <p><span>Game over!</span></p>
+    <p>Congratilations <span>${name}</span>!</p>
+    <p>You have completed the picture in </p>
+    <p><span>${minutes}</span> minuten <span>${seconds}</span> secunden</p>
+    <p>scored <span>${score}</span> points</p>
+    <p>Your total score is: <span>${totalScore}</span> points</p>
+    `;}
+    if(unvictory){
+        info.innerHTML=`
+        <p><span>Game over!</span></p>
+        <p>Sorry <span>${name}</span>!</p>
+        <p>You have not completed the picture in <span>15</span> minuten!</p>
+        <p>Your points are reduced by <span>100</span></p>
+        <p>Your total score is: <span>${totalScore}</span> points</p>
+        `;
+    }
+    info.style.fontSize='1.3rem';
+    info.style.fontWeight='bold';
+    info.style.color='black';
+    info.style.textAlign='center';
+     info.style.backgroundColor='rgba(0,0,0,0.7)';
+     info.style.backdropFilter='blur(5px)';
+    info.style.color='white';
+    info.style.padding='1rem';
+    info.style.border='2px solid black';
+    info.style.borderRadius='10px';
+    info.style.boxShadow='0 0 10px rgba(0,0,0,0.5)';
+    info.style.position='absolute';
+    info.style.textAlign='center';
+        // if(window.innerWidth <= 650){
+            if(mediaQuery650.matches){
+            info.style.width='100%';
+            info.style.height='100%';
+            info.style.top='0';
+            info.style.right='0';
+            info.style.left='0';
+            info.style.bottom='0'; 
+            console.log(`width:${window.innerWidth}`);
+            
+        }else if(mediaQuery897.matches){
+            info.style.top='10%';
+            info.style.right='10%';
+            info.style.zIndex='10';
+            info.style.width='80%';
+            info.style.height='90%';
+            console.log(`width:${window.innerWidth}`);
+        }
+        else if(mediaQuery1300.matches){
+            info.style.top='20%';
+            info.style.right='25%';
+            info.style.zIndex='10';
+            info.style.width='50%';
+            info.style.height='75%';
+            console.log(`width:${window.innerWidth}`);
+        }
+        else if(mediaQuery1550.matches){
+            info.style.top='15%';
+            info.style.right='30%';
+            info.style.zIndex='10';
+            info.style.width='40%';
+            info.style.height='82%';
+            console.log(`width:${window.innerWidth}`);
+        }
+        else{
+        info.style.top='19.3%';
+        info.style.right='37.5%';
+        info.style.zIndex='10';
+        info.style.width='29rem';
+        info.style.height='29rem';
+        console.log(`width:${window.innerWidth}`);
+        }
+
+        
+    document.body.append(info);
+    info.querySelectorAll('span').forEach((span)=>{
+        if(victory){
+          span.style.color='yellow';}
+          if(unvictory){
+            span.style.color='red';
+          }
+        span.style.fontSize='2rem';
+        span.style.fontWeight='bold';
+    });
+    return info;
 }
