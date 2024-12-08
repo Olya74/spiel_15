@@ -24,11 +24,11 @@ const imgList=document.getElementById('imgList');
 const shuffle=document.getElementById('shuffle');
 let CELL_SIZE = 4;
 const countItems=16;
-const puzzleWidth = canvas.width/CELL_SIZE;
-const puzzleHeight = canvas.height/CELL_SIZE;
 const blankNumber=countItems;
-const imagePieceWidth = img.width / CELL_SIZE; 
-const imagePieceHeight = img.height / CELL_SIZE; 
+let puzzleWidth = canvas.width/CELL_SIZE;
+let puzzleHeight = canvas.height/CELL_SIZE;
+let imagePieceWidth = img.width / CELL_SIZE; 
+let imagePieceHeight = img.height / CELL_SIZE; 
 
 
 let players;   
@@ -70,11 +70,12 @@ players =(JSON.parse(localStorage.getItem('players')) || []).map((obj)=>Player.f
                 player.setActive(false);
             }
         });
-    
+   
         localStorage.setItem('players', JSON.stringify(players));
         spanName.textContent = `Welcome, ${currentPlayer.name}`;
         inpName.value = '';
     });
+
 
 let imgSrc=['asserts/img/1.png','asserts/img/2.png','asserts/img/3.png','asserts/img/4.png','asserts/img/D1.png'];
 
@@ -93,18 +94,15 @@ const init = function () {
     victory=false;
     unvictory=false;
     img.addEventListener('load',()=>{
-        ctx.drawImage(img,0,0,canvas.width,canvas.height);
-        setPositionItemsWithPicture(matrix,itemNodes);
-        setPositionItems(matrix,itemNodes);
-        //setPositionItemsWithPicture(matrix,itemNodes);
-//     ctx.drawImage(img,0,0,canvas.width,canvas.height);
-//    setPositionItemsWithPicture(matrix,itemNodes);
-//    matrix=getMatrix(shuffleArray(matrix));
-//    setPositionItems(matrix,itemNodes);
-//    //setPositionItemsWithPicture(matrix,itemNodes);
+    ctx.drawImage(img,0,0,canvas.width,canvas.height);
+   setPositionItemsWithPicture(matrix,itemNodes);
+   //matrix=getMatrix(shuffleArray(matrix));
+   setPositionItems(matrix,itemNodes);
+   //setPositionItemsWithPicture(matrix,itemNodes);
     });
     currentPlayer = players.find((player)=>player.active===true) || new Player('Guest');
     spanName.textContent = `Welcome, ${currentPlayer.name}`;
+
   };
     init();
 
@@ -131,6 +129,7 @@ start.addEventListener('click',()=>{
   idTimer = setInterval(updateTimer,1000);
   start.classList.add('button_active');
   start.textContent='Stop';
+ 
     }
     else if (!isStarted)
     {
@@ -260,63 +259,21 @@ containerNode.addEventListener('click',(e)=>{
         victory=false;
        setTimeout(()=>{
          document.getElementById('info').remove();
-       },30000);
+       },3000);
     }
 });
-document.addEventListener('click',(e)=>{
-    if(e.target.closest('img')){
-       img.src=e.target.src;
-       img.addEventListener('load',()=>{
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        ctx.drawImage(img,0,0,canvas.width,canvas.height);
-        setPositionItemsWithPicture(matrix,itemNodes);});
-    }
-}
-);
-// imgList.addEventListener('click',(e)=>{
-//     let imgNode=e.target.closest('img');
-//     for(let player of players){
-   
-//        if(player.active===true){
-//               currentPlayer=player;
-//               break;
-//        }
-//        if (currentPlayer && typeof currentPlayer.setBilder === 'function') {
-//         currentPlayer.setBilder(img.src);
-//     } else {
-//         console.error("currentPlayer or setBilder is undefined");
-//     }
-//        console.log('currentPl',currentPlayer);
-       
-//     }
-//     if(imgNode){
-//         img.src = imgNode.src;
-        
-       
-//         img.addEventListener('load',()=>{
-//         ctx.clearRect(0,0,canvas.width,canvas.height);
-//        // ctx.drawImage(img,0,0,canvas.width,canvas.height);
-//         setPositionItemsWithPicture(matrix,itemNodes);});
-//         }
-// });
+
+
 
 imgList.addEventListener('click', (e) => {
     const imgNode = e.target.closest('img');
     if (!imgNode) return;
-
-    // Ensure currentPlayer is active
-    currentPlayer = players.find((player) => player.active);
-    if (!currentPlayer || typeof currentPlayer.setBilder !== 'function') {
-        console.error('currentPlayer or setBilder is undefined');
-        return;
-    }
-
     img.src = imgNode.src;
-    img.addEventListener('load', () => {
+    img.addEventListener('load', (e) => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        setPositionItemsWithPicture(matrix, itemNodes);
+        setPositionItemsWithPicture(matrix, itemNodes);   
     });
-
+   
 });
 
 /* helpers */
@@ -415,8 +372,6 @@ function setPositionItemsWithPicture(matrix,arr){
     }
     }
     function setNodesStyleWithPicture(srcCol,srcRow,destX,destY,node){
-   // node.style.transform=`translate3D(${srcCol*puzzleWidth}%,${srcRow*puzzleHeight}%,0)`;
-    //ctx.clearRect(0,0,CELL_SIZE,CELL_SIZE);
     ctx.fillStyle='white';
     ctx.drawImage(
         img,
@@ -497,6 +452,7 @@ function createBtnAudio(audio){
            btnStopMusik.classList.add('button_play_pause');
          }
       });
+      return btnStopMusik;
 }
 
 function createElementImg(src){
