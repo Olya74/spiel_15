@@ -95,7 +95,7 @@ const init = function () {
     img.addEventListener('load',()=>{
     ctx.drawImage(img,0,0,canvas.width,canvas.height);
    setPositionItemsWithPicture(matrix,itemNodes);
-   //matrix=getMatrix(shuffleArray(matrix));
+    matrix=getMatrix(shuffleArray(matrix));
    setPositionItems(matrix,itemNodes);
    //setPositionItemsWithPicture(matrix,itemNodes);
     });
