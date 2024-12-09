@@ -95,7 +95,7 @@ const init = function () {
     img.addEventListener('load',()=>{
     ctx.drawImage(img,0,0,canvas.width,canvas.height);
    setPositionItemsWithPicture(matrix,itemNodes);
-   matrix=getMatrix(shuffleArray(matrix));
+   //matrix=getMatrix(shuffleArray(matrix));
    setPositionItems(matrix,itemNodes);
    //setPositionItemsWithPicture(matrix,itemNodes);
     });
@@ -229,7 +229,6 @@ containerNode.addEventListener('click',(e)=>{
       audio = audioWithPath('asserts/img/victory.mp3');
         createBtnAudio(audio);
         isStarted=false;
-        audio.autoplay=false;
     }
     if(victory){
         start.classList.remove('button_active');
@@ -292,7 +291,7 @@ function updateTimer(){
             isStarted=false;
             audio = audioWithPath('asserts/img/ups.mp3');
             createBtnAudio(audio);
-            audio.autoplay=false;
+        
             score=-100;
             currentPlayer.addScore(score);
             createInfo(currentPlayer.name,score,time,currentPlayer.score);
