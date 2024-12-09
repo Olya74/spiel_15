@@ -40,10 +40,9 @@ let victory;
 let score;
 let unvictory;
 let audio=null;
-let startMinutes =0.6;
+let startMinutes =0.1;
 let time=startMinutes*60;
 let imgArr=[];
-let isAudioPlay=false;
 let timeVictory;
 
 
@@ -96,7 +95,7 @@ const init = function () {
     img.addEventListener('load',()=>{
     ctx.drawImage(img,0,0,canvas.width,canvas.height);
    setPositionItemsWithPicture(matrix,itemNodes);
-   //matrix=getMatrix(shuffleArray(matrix));
+   matrix=getMatrix(shuffleArray(matrix));
    setPositionItems(matrix,itemNodes);
    //setPositionItemsWithPicture(matrix,itemNodes);
     });
@@ -113,6 +112,7 @@ newGame.addEventListener('click',(e)=>{
         return;
     }
     resetTimer();
+
     isStarted=false;
     isPaused=false;
     victory=false;
@@ -121,15 +121,17 @@ newGame.addEventListener('click',(e)=>{
     start.classList.remove('button_active');
      matrix=getMatrix(shuffleArray(matrix));
     setPositionItems(matrix,itemNodes);
-   // setPositionItemsWithPicture(matrix,itemNodes);
+    //setPositionItemsWithPicture(matrix,itemNodes);
 });
 start.addEventListener('click',()=>{
     isStarted=!isStarted;
+    
     if(isStarted){     
   idTimer = setInterval(updateTimer,1000);
   start.classList.add('button_active');
   start.textContent='Stop';
- 
+  let btnM= document.getElementById('btnPause');
+ newGame.removeChild(btnM);
     }
     else if (!isStarted)
     {
@@ -149,26 +151,6 @@ pause.addEventListener('click',()=>{
         pause.style.backgroundColor='black';
     }
 });
-if(unvictory){
-    victory=false;
-    isAudioPlay=true;
-    isStarted=false;
-    audio = audioWithPath('asserts/img/ups.mp3');
-    createBtnAudio(audio);
-    if(isAudioPlay){
-    }
-    score=-100;
-    currentPlayer.addScore(score);
-    createInfo(currentPlayer.name,score,time,currentPlayer.score);
-    setTimeout(()=>{
-        document.getElementById('info').remove();
-      },30000);
-    localStorage.setItem('players',JSON.stringify(players));
-    unvictory=false;
-    start.classList.remove('button_active');
-    start.textContent='Start';
-    resetTimer();
-}
 });
 
 //Eingabe ausblenden
@@ -243,13 +225,11 @@ containerNode.addEventListener('click',(e)=>{
       console.log('timeVictory',timeVictory);
       score=Math.floor(10000/timeVictory);
       currentPlayer.addScore(score);
-      isAudioPlay=true;
       localStorage.setItem('players',JSON.stringify(players));
-      if(isAudioPlay){
       audio = audioWithPath('asserts/img/victory.mp3');
         createBtnAudio(audio);
         isStarted=false;
-    }
+        audio.autoplay=false;
     }
     if(victory){
         start.classList.remove('button_active');
@@ -263,7 +243,18 @@ containerNode.addEventListener('click',(e)=>{
     }
 });
 
+myPuzzle.addEventListener('click',(e)=>{
+if(e.target.closest('img')){
+    img=new Image();
+    img.src=e.target.src;
+    img.addEventListener('load',()=>{
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+       // ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        setPositionItemsWithPicture(matrix,itemNodes);
+    });
+}
 
+});
 
 imgList.addEventListener('click', (e) => {
     const imgNode = e.target.closest('img');
@@ -294,11 +285,26 @@ function updateTimer(){
         unvictory=true;
         audio = audioWithPath('asserts/img/ups.mp3');
         resetTimer();
-        audio=null;
+        audio.autoplay=false;
     }
     if(unvictory){
-        alert('Time is over');
-        unvictory=false;
+        if(unvictory){
+            isStarted=false;
+            audio = audioWithPath('asserts/img/ups.mp3');
+            createBtnAudio(audio);
+            audio.autoplay=false;
+            score=-100;
+            currentPlayer.addScore(score);
+            createInfo(currentPlayer.name,score,time,currentPlayer.score);
+            setTimeout(()=>{
+                document.getElementById('info').remove();
+              },3000);
+            localStorage.setItem('players',JSON.stringify(players));
+            unvictory=false;
+            start.classList.remove('button_active');
+            start.textContent='Start';
+            resetTimer();
+        }
     }
 }
 function setTimerStyle(){
@@ -310,7 +316,6 @@ function setTimerStyle(){
     timeEl.style.display='inline-block'; 
 }
 function resetTimer(){
-    audio=null
     time=startMinutes*60;
     timeEl.innerHTML='';
     timeEl.previousSibling.textContent='';
@@ -372,6 +377,7 @@ function setPositionItemsWithPicture(matrix,arr){
     }
     }
     function setNodesStyleWithPicture(srcCol,srcRow,destX,destY,node){
+       
     ctx.fillStyle='white';
     ctx.drawImage(
         img,
