@@ -9,10 +9,12 @@
   <body>
       <div class="page">
         <h1>Play in 15</h1>
+        <input type="text" id="playerName">
+        <span id="spanName"></span>
         <p>Assemble this picture or select some images</p>
         <p>You have 15 minutes <span id="time"></span></p>
         <canvas id="canvas" max-width="400" max-height="400"></canvas>
-    <div class="fifteen" id="fifteen">
+      <div class="fifteen" id="fifteen">
        <button class="item" data-matrix-id="1"><span class="itemVal">1</span></button ><button class='item' data-matrix-id='2'><span class="itemVal">2</span></button
       ><button class="item" data-matrix-id="3"><span class="itemVal">3</span></button ><button class='item' data-matrix-id='4'><span class="itemVal">4</span></button
       ><button class="item" data-matrix-id="5"><span class="itemVal">5</span></button ><button class='item' data-matrix-id='6'><span class="itemVal">6</span></button
@@ -23,16 +25,22 @@
       ><button class="item" data-matrix-id="15"><span class="itemVal">15</span></button><button class="item" data-matrix-id="16"><span class="itemVal" >16</span></button>
     </div>
     <div>
-    <button class="button" id="start">Start timer</button>
+    <button class="button" id="start">Start</button>
     <button class="button" id="pause">Pause</button>
-    <button class="button" id="shuffle">Shuffle</button>
-    <a href="#" id="imgSelect"><button class="button btnSelect">Select one/more images </button></a>
+    <!-- <button class="button" id="shuffle">Shuffle</button> -->
+    <a href="#" id="imgSelect"><button class="button btnSelect">Select one/more images from your computer</button></a>
     <input type="file" accept="image/*" id="inpImg" multiple style="display: none;">
+    <div id="myPuzzle">
+       <h2>Choose image</h2>
+      <div>
+       
+      <img src="imgProject/1.png" alt="my img"></div><div><img src="imgProject/2.png" alt="myimg"></div><div><img src="imgProject/3.png" alt=""></div><div><img src="imgProject/4.png" alt="myimg"></div><div><img src="imgProject/o.jpg" alt="myimg"></div><div><img src="imgProject/zug.jpg" alt=""></div>
+      </div>
     <div id="imgList"></div> 
   </div>
     </div>
     </body>
-    <script src="index.js"></script>
+    <script src="index.js" type="module"   ></script>
   </body>
 </html>
 

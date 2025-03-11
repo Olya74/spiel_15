@@ -91,10 +91,57 @@ h1{font:2rem/1 Georgia,serif;margin-bottom: 1em;
         opacity: 0.7;
     }
 }
+
+#myPuzzle{
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    display: flex;
+   width: 22%;
+    justify-content:space-around;
+    align-items:space-between;
+    flex-wrap: wrap;
+    background-color: #000203;
+    opacity: 0.8;
+    overflow: hidden;
+}
+#myPuzzle div{
+   margin:0.4rem;
+    border: 3px solid #fff;
+    flex: 1 1 33%;
+    width: 30%;
+    height: 25%;
+    padding: 1rem;
+  }
+
+#myPuzzle img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    cursor: pointer;
+    transition: transform 0.4s;
+}
+ h2{
+    color: #fff;
+   font-weight: bold;
+   width: 100%;
+   text-align: center;
+}
+#myPuzzle img:hover{
+    transform: scale(1.14);
+    opacity: 1;
+}
 @media (min-width: 1160px){
-    #canvas{
+    #canvas
+    {
         display: block;
+        
     }
+#myPuzzle{
+    display: flex;
+}
 }
 @media (min-width: 200px) and (max-width:1158px){
     body{overflow: auto;}
@@ -103,6 +150,7 @@ h1{font:2rem/1 Georgia,serif;margin-bottom: 1em;
         margin-bottom: 0.2rem;
     }
     .fifteen{
+        
         .item{
             font-size: 1rem;
         }
@@ -115,4 +163,68 @@ h1{font:2rem/1 Georgia,serif;margin-bottom: 1em;
     #canvas{
         display: none;
     }
+    
+}
+@media (min-width: 200px) and (max-width: 738px){
+    #myPuzzle{
+        display: none;
+    }
+}
+  
+.active{
+    background-color: red;
+    margin: 0.7rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    color: #fff;
+    box-shadow: 0 0 0.5rem #1b0901;
+}
+#imgList{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+#imgList img{
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    object-position: center center;
+    cursor: pointer;
+    transition: transform 0.4s;
+}
+
+#spanName{
+    font-weight: 700;
+    font-size: 1.6rem;
+    margin: 0.5rem;
+    color:rgb(58, 3, 3);
+    box-shadow: 0 0 0.5rem #1b0901;
+    font-family:Georgia, 'Times New Roman', Times, serif
+}
+
+img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+}
+
+
+.button_active{
+    background-color:rgb(224, 26, 26);
+    box-shadow: inset 0 0 0.8rem  #131212fa;
+    font-weight: 700;
+}
+.time_active{
+    background-color:black;
+    /* box-shadow: inset 0 0 2rem  #fff; */
+    box-shadow: inset 0 0 2rem  #e60303;
+    font-weight: 600;
+    color: #fff;
+    display: inline-block;
+    padding:0.5rem 0.8rem;
+    font-size: 2rem;
+    margin: 0 auto 0.6rem;
 }
