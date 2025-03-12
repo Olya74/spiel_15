@@ -1,6 +1,7 @@
 import Player from "./player.js";
 let players = [];
 let currentPlayer;
+let score;
 let playerName = document.getElementById("playerName");
 players = (JSON.parse(localStorage.getItem("players")) || []).map((obj) =>
   Player.fromJSON(obj)
@@ -17,11 +18,15 @@ const inpImg = document.getElementById("inpImg");
 const imgSelect = document.getElementById("imgSelect");
 const imgList = document.getElementById("imgList");
 const spanName = document.getElementById("spanName");
-const myPuzzle = document.getElementById('myPuzzle');
+const myPuzzle = document.getElementById("myPuzzle");
 let pause = document.getElementById("pause");
 let img = new Image();
-let audio; 
+let audio;
 
+let img1 = new Image();
+img1.src = "imgProject/1.png";
+img1.width = 400;
+img1.height = 400;
 
 img.src = "imgProject/4.png";
 canvas.width = 400;
@@ -45,75 +50,72 @@ img.addEventListener("load", () => {
   setPositionItemsWithPicture(matrix, itemNodes);
 });
 
-
 let isPaused;
-let victory ;
-let unvictory ;
+let victory;
+let unvictory;
 let isStarted;
 let startMinutes;
-let time ;
+let time;
 let idTimer;
 
+playerName.addEventListener("change", (e) => {
+  const existingPlayer = players.find(
+    (player) => player.name === e.target.value
+  );
+  if (existingPlayer) {
+    existingPlayer.setActive(true);
+    currentPlayer = existingPlayer;
+  } else {
+    currentPlayer = new Player(e.target.value);
+    currentPlayer.setActive(true);
+    players.push(currentPlayer);
+  }
 
-
-  playerName.addEventListener("change", (e) => {
-    const existingPlayer = players.find(
-      (player) => player.name === e.target.value
-    );
-    if (existingPlayer) {
-      existingPlayer.setActive(true);
-      currentPlayer = existingPlayer;
-    } else {
-      currentPlayer = new Player(e.target.value);
-      currentPlayer.setActive(true);
-      players.push(currentPlayer);
+  // Deactivate other players
+  players.forEach((player) => {
+    if (player.name !== currentPlayer.name) {
+      player.setActive(false);
     }
-
-    // Deactivate other players
-    players.forEach((player) => {
-      if (player.name !== currentPlayer.name) {
-        player.setActive(false);
-      }
-    });
-
-    localStorage.setItem("players", JSON.stringify(players));
-    spanName.textContent = `Welcome, ${currentPlayer.name}`;
-    playerName.value = "";
-    console.log("currentPlayer:", currentPlayer);
-    // playerName.style.display = "none";
   });
 
+  localStorage.setItem("players", JSON.stringify(players));
+  spanName.textContent = `Welcome, ${currentPlayer.name}`;
+  playerName.value = "";
+  console.log("currentPlayer:", currentPlayer);
+  // playerName.style.display = "none";
+});
 
 spanName.textContent = `Welcome, ${currentPlayer.name}`;
-const init =function(){
-    isPaused=false;
-    isStarted=true;
-    victory=false;
-    unvictory=false;
-    startMinutes = 0.25;
-    time = startMinutes * 1160;
-    idTimer = setInterval(updateTimer, 1000);
-    matrix = getMatrix(shuffleArray(matrix));
-    setPositionItems(matrix, itemNodes);
-}
+
+const init = function () {
+  isPaused = false;
+  isStarted = true;
+  victory = false;
+  unvictory = false;
+  startMinutes = 10;
+  time = startMinutes * 60;
+  idTimer = setInterval(updateTimer, 1000);
+  matrix = getMatrix(shuffleArray(matrix));
+  setPositionItems(matrix, itemNodes);
+};
 
 start.addEventListener("click", () => {
- isStarted = !isStarted;
+  isStarted = !isStarted;
   if (isStarted) {
-     init();
-     start.textContent = "Stop";
-     start.classList.add("active");
+    init();
+    start.textContent = "Stop";
+    start.classList.add("active");
   } else {
     clearInterval(idTimer);
     resetTimer();
-    start.textContent='Start';
+    start.textContent = "Start";
     start.classList.remove("active");
+    pause.textContent = "Pause";
+    pause.classList.remove("active");
     imgSelect.style.display = "block";
     matrix = getMatrix(itemNodes.map((item) => Number(item.dataset.matrixId)));
     setPositionItems(matrix, itemNodes);
   }
- 
- 
 });
 
 pause.addEventListener("click", () => {
@@ -123,7 +125,7 @@ pause.addEventListener("click", () => {
     pause.classList.add("active");
   } else {
     pause.textContent = "Pause";
-   pause.classList.remove("active");
+    pause.classList.remove("active");
   }
 });
 
@@ -131,7 +133,6 @@ pause.addEventListener("click", () => {
 imgSelect.addEventListener(
   "click",
   (e) => {
-   
     if (inpImg) {
       inpImg.click();
     }
@@ -157,17 +158,54 @@ inpImg.addEventListener("change", (e) => {
 
 imgList.addEventListener("click", (e) => {
   let imgNode = e.target.closest("img");
-  if (!imgNode) {return;}
-    img.src = imgNode.src;
+  if (!imgNode) {
+    return;
+  }
+  itemNodes.forEach((item) => {
+    item.style.backgroundImage = `url(${imgNode.src})`;
+  });
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(imgNode, 0, 0, canvas.width, canvas.height);
 });
+
 myPuzzle.addEventListener("click", (e) => {
   let imgNode = e.target.closest("img");
   if (!imgNode) {
     return;
   }
-  img.src = imgNode.src;
-  
+
+  itemNodes.forEach((item) => {
+    item.style.backgroundImage = `url(${imgNode.src})`;
+  });
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(imgNode, 0, 0, canvas.width, canvas.height);
+  switch (imgNode.src.split("/").pop()) {
+    case "1.png":
+      myPuzzle.style.backgroundColor = "rgba(35, 71, 35, 0.38)";
+      return;
+    case "2.png":
+      myPuzzle.style.backgroundColor = "rgb(5, 126, 141)";
+      return;
+    case "3.png":
+      myPuzzle.style.backgroundColor = "rgb(11, 12, 73)";
+      return;
+    case "4.png":
+      myPuzzle.style.backgroundColor = "hsl(120, 50.00%, 74.90%)";
+      return;
+    case "o.jpg":
+      myPuzzle.style.backgroundColor = "hsl(98, 19.10%, 66.10%)";
+      return;
+    case "zug.jpg":
+      myPuzzle.style.backgroundColor = "rgb(221, 156, 156)";
+
+      return;
+    default:
+      myPuzzle.style.backgroundColor = "black";
+      return;
+  }
 });
+
+//um eine button füt shuffle zu erstellen
 
 // document.getElementById("shuffle").addEventListener("click", () => {
 //   matrix = getMatrix(shuffleArray(matrix));
@@ -192,22 +230,19 @@ containerNode.addEventListener("click", (e) => {
     audio = audioWithPath("imgProject/victory.mp3");
     createBtnAudio(audio);
     clearInterval(idTimer);
-    let score = time;
+    score = time / 10;
     let name = currentPlayer.name;
-     createInfo(name, score, time);
-     const infoID= setTimeout(() => {
-      info.style.display = "none";
-      clearTimeout(infoID);
-    }
-    , 5000);
-   
+    createInfo(name, score, time);
     currentPlayer.addScore(score);
     localStorage.setItem("players", JSON.stringify(players));
-    alert("Victory");
-    isStarted = false;
-    start.textContent = "Start";
-    start.classList.remove("active");
+    // isStarted = false;
+    // start.textContent = "Start";
+    // start.classList.remove("active");
   }
+
+  setTimeout(() => {
+    info.style.display = "none";
+  }, 2000);
 });
 
 /* helpers */
@@ -302,7 +337,6 @@ function setNodesStyleWithPicture(srcCol, srcRow, destX, destY, node) {
   node.style.transform = `translate3D(${srcCol * puzzleWidth}%,${
     srcRow * puzzleHeight
   }%,0)`;
-  
   ctx.clearRect(0, 0, CELL_SIZE, CELL_SIZE);
   ctx.fillStyle = "white";
   ctx.drawImage(
@@ -364,7 +398,7 @@ function isVictory(matrix) {
 }
 
 function audioWithPath(path) {
-    audio = new Audio();
+  audio = new Audio();
   audio.src = path;
   audio.autoplay = true;
   return audio;
@@ -376,8 +410,8 @@ function createBtnAudio(audio) {
   btnStopMusik.setAttribute("class", "button active");
   btnStopMusik.textContent = "Stop music";
   btnStopMusik.style.position = "absolute";
-  btnStopMusik.style.top = "1rem";
-  btnStopMusik.style.right = "280px";
+  btnStopMusik.style.bottom = 0;
+  btnStopMusik.style.right = 0;
   document.body.appendChild(btnStopMusik);
   btnStopMusik.addEventListener("click", () => {
     btnStopMusik.classList.toggle("active");
@@ -392,39 +426,36 @@ function createBtnAudio(audio) {
   });
 }
 
-
-
-
-   function createInfo(name, score, time) {
-     let info = document.createElement("div");
-     info.setAttribute("id", "info");
-     let minutes = Math.floor(time / 60);
-     let seconds = time % 60;
-     info.innerHTML = `
+function createInfo(name, score, time) {
+  let info = document.createElement("div");
+  info.setAttribute("id", "info");
+  let minutes = Math.floor(time / 60);
+  let seconds = time % 60;
+  info.innerHTML = `
     <p><span>Game over!</span></p>
     <p>Congratilations <span>${name}</span>!</p>
     <p>You have completed the picture in <span>${minutes}</span> minuten <span>${seconds}</span> secunden</p>
     <p>scored <span>${score}</span> points</p>
     `;
-     info.style.fontSize = "1.3rem";
-     info.style.fontWeight = "bold";
-     info.style.color = "black";
-     info.style.textAlign = "center";
-     info.style.backgroundColor = "lightgreen";
-     info.style.padding = "1rem";
-     info.style.border = "2px solid black";
-     info.style.borderRadius = "10px";
-     info.style.boxShadow = "0 0 10px rgba(0,0,0,0.5)";
-     info.style.top = "0";
-     info.style.right = "34.5%";
-     info.style.zIndex = "10";
-     info.style.position = "absolute";
-     info.style.alignContent = "center";
-     document.body.append(info);
-     info.querySelectorAll("span").forEach((span) => {
-       span.style.color = "red";
-       span.style.fontSize = "2rem";
-       span.style.fontWeight = "bold";
-     });
-     return info;
-   }
+  info.style.fontSize = "1.3rem";
+  info.style.fontWeight = "bold";
+  info.style.color = "black";
+  info.style.textAlign = "center";
+  info.style.backgroundColor = "lightgreen";
+  info.style.padding = "1rem";
+  info.style.border = "2px solid black";
+  info.style.borderRadius = "10px";
+  info.style.boxShadow = "0 0 10px rgba(0,0,0,0.5)";
+  info.style.top = "0";
+  info.style.right = "34.5%";
+  info.style.zIndex = "10";
+  info.style.position = "absolute";
+  info.style.alignContent = "center";
+  document.body.append(info);
+  info.querySelectorAll("span").forEach((span) => {
+    span.style.color = "red";
+    span.style.fontSize = "2rem";
+    span.style.fontWeight = "bold";
+  });
+  return info;
+}

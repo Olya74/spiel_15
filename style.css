@@ -2,21 +2,25 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    
 }
 
 body,
 html{font: 16px/1.4 Georgia,serif;
     background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+   
 }
 body{
     position: relative;
 }
+
 p{margin-bottom: 1em;
     font-weight: 600;
     
 }
 
 .page{max-width: 29rem;padding: 2rem;margin: 0 auto;text-align: center;user-select: none;
+    height: 100vh;
 }
 #number{
     width: 5rem;
@@ -46,7 +50,10 @@ a{color: #da1939fa;
         opacity: 0.7;
     }
 }
-h1{font:2rem/1 Georgia,serif;margin-bottom: 1em;
+h1{
+    font:2rem/1;
+    margin-bottom: 1em;
+   
 }
 #imgList{
     margin-top: 1rem;
@@ -96,23 +103,25 @@ h1{font:2rem/1 Georgia,serif;margin-bottom: 1em;
     position: absolute;
     top: 0;
     right: 0;
-    height: 100vh;
     display: flex;
-   width: 22%;
-    justify-content:space-around;
-    align-items:space-between;
     flex-wrap: wrap;
-    background-color: #000203;
-    opacity: 0.8;
+    max-width: 25%;
+    justify-content:space-evenly;
+    padding:0.5rem;
+    background-color: #cbd7da;
+    opacity: 0.9;
     overflow: hidden;
+    padding-bottom: 100%;
 }
 #myPuzzle div{
-   margin:0.4rem;
-    border: 3px solid #fff;
-    flex: 1 1 33%;
-    width: 30%;
-    height: 25%;
+    border: 2px solid #fff;
+    box-shadow: 2px 2px 2px hsl(157, 90%, 4%);
     padding: 1rem;
+    margin: 0.5rem;
+   width: 200px;
+   height: 200px;
+  background-color: #cddee2;
+ 
   }
 
 #myPuzzle img{
@@ -122,6 +131,8 @@ h1{font:2rem/1 Georgia,serif;margin-bottom: 1em;
     object-position: center center;
     cursor: pointer;
     transition: transform 0.4s;
+    border: 2px dashed #251f27;
+    box-shadow: 2px 2px 2px hsl(157, 90%, 4%);
 }
  h2{
     color: #fff;
@@ -129,52 +140,13 @@ h1{font:2rem/1 Georgia,serif;margin-bottom: 1em;
    width: 100%;
    text-align: center;
 }
-#myPuzzle img:hover{
-    transform: scale(1.14);
-    opacity: 1;
-}
-@media (min-width: 1160px){
-    #canvas
-    {
-        display: block;
-        
-    }
-#myPuzzle{
-    display: flex;
-}
-}
-@media (min-width: 200px) and (max-width:1158px){
-    body{overflow: auto;}
-    
-    h1,p{
-        margin-bottom: 0.2rem;
-    }
-    .fifteen{
-        
-        .item{
-            font-size: 1rem;
-        }
-    }
-    .button{
-        font-size: 1rem;
-        margin-bottom: 0.5rem;
-        padding: 0.3rem 1rem;
-    }
-    #canvas{
-        display: none;
-    }
-    
-}
-@media (min-width: 200px) and (max-width: 738px){
-    #myPuzzle{
-        display: none;
-    }
-}
-  
+
+
+
 .active{
     background-color: red;
     margin: 0.7rem;
-    padding: 0.5rem;
+    padding: 0.5rem 1.5rem;
     border-radius: 0.5rem;
     font-weight: 700;
     color: #fff;
@@ -196,14 +168,23 @@ h1{font:2rem/1 Georgia,serif;margin-bottom: 1em;
 }
 
 #spanName{
-    font-weight: 700;
+    font-weight: 600;
+    padding:0.3rem  0.5rem;
     font-size: 1.6rem;
-    margin: 0.5rem;
     color:rgb(58, 3, 3);
     box-shadow: 0 0 0.5rem #1b0901;
+    font-family:Georgia, 'Times New Roman', Times, serif;
+     border: 1px solid #000;
+    border-radius: 0.5rem;
+}
+input{
+    width:30%;
+    padding: 0.5rem;
+    font-size: 1.2rem;
+    border: 1px solid #000;
+    border-radius: 0.5rem;
     font-family:Georgia, 'Times New Roman', Times, serif
 }
-
 img{
     width: 100%;
     height: 100%;
@@ -227,4 +208,51 @@ img{
     padding:0.5rem 0.8rem;
     font-size: 2rem;
     margin: 0 auto 0.6rem;
+}
+
+  @media (min-width: 1349px){
+    #canvas
+    {
+        display: block;
+        
+    }
+#myPuzzle{
+    display: flex;
+}
+}
+@media (max-width:1347px){
+    body{overflow: auto;}
+    input{
+        width: 100%;
+      
+        margin-bottom: 0.5rem;
+    }
+    #spanName{
+        font-size: 1rem;
+        text-wrap: nowrap;
+        margin-left: -1.4rem;
+    }
+    h1,p{
+        margin-bottom: 0.2rem;
+    }
+    .fifteen{
+        
+        .item{
+            font-size: 1rem;
+        }
+    }
+    .button{
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+        padding: 0.3rem 1rem;
+    }
+    #canvas{
+        display: none;
+    }
+   #myPuzzle{
+    display: none;
+}
+.btnSelect{
+    padding: 0.3rem 0.1rem;
+}
 }
