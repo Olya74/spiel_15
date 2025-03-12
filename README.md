@@ -1,5 +1,14 @@
 # spiel_15
 
+# Sie können Bilder von Ihrem Computer auswählen und das fünfzehnte Puzzle spielen
+# Sie können auch aus den angegebenen Bildern wählen
+
+
+
+
+
+# was wird gemacht
+
 ## set board und picture 
 
 1.matrix bekommen
